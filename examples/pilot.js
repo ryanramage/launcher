@@ -14,6 +14,8 @@ let muted = {}
 let solo = {}
 
 exports.onMessage = (config, services, channel, note, value) => {
+  // return console.log(channel, note, value)
+
   let val = null
   let message = null
 
@@ -62,10 +64,19 @@ exports.onMessage = (config, services, channel, note, value) => {
     if (track !== null && trackCommand !== null) message = `C${track}${trackCommand}${val}`
   }
 
+  // first row sends
+  if (channel === 184 && note >= 13 && note <= 20) {
+    let send = note - 13
+    let val = Math.floor(interpolate(value/128, 0, 16)).toString(16).toUpperCase()
+    message = `C${trackControl}SEND${send}${val}`
+  }
+
+
 
   // let val = Math.round(interpolate(value/128, 0, 35)).toString(36).toUpperCase()
   // let message = `C0VOL${val}`
   if (!message) return
+  console.log(message)
   const oscMsg = new services.osc.Message(message)
   services.client.send(oscMsg, (err) => {
     if (err) { console.warn(err) }
